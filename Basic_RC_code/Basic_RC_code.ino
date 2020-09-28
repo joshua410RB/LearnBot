@@ -15,14 +15,14 @@ void setup() {
   digitalWrite(13,0);
   delay(1000);
   rx.begin(); //Initialize the receiver connection
-  while(!rx.getNetworkStatus()) {
+  while(!rx.getNetworkStatus()) { //wait for receiver to connect to WiFi
     delay(100);
   }
 
   //Initialize motor driver pins 
   driver.attachMotorA(inputA1, inputA2);
   driver.attachMotorB(inputB1, inputB2);
-  driver.motorAStop();
+  driver.motorAStop();  //ensure that the motors are not spinning
   driver.motorBStop();
 
   //flash LED on pin 13 while there is no connection
@@ -32,30 +32,30 @@ void setup() {
     digitalWrite(13,0);
     delay(100);
   }
-  digitalWrite(13,1);
+  digitalWrite(13,1); //turn on pin 13 LED
 }
 
 void loop() {
-  if(rx.getConnectionStatus())  {
-    motorSpeedA=rx.getChannel(1)-127;
-    motorSpeedB=rx.getChannel(3)-127;
-    if(motorSpeedA>0) {
+  if(rx.getConnectionStatus())  { //get motor speed values when a connection is available
+    motorSpeedA=rx.getChannel(1)-127; //motorA on left vertical joystick
+    motorSpeedB=rx.getChannel(3)-127; //motorB on right vetical joystick
+    if(motorSpeedA>0) { //set the speed of motorA based on received value
       driver.motorAForward(2*motorSpeedA);
     }
     else  {
       driver.motorAReverse(2*abs(motorSpeedA));
     }
-    if(motorSpeedB>0) {
+    if(motorSpeedB>0) { //set the speed of motorB based on received value
       driver.motorBForward(motorSpeedB);
     }
     else  {
       driver.motorBReverse(2*abs(motorSpeedB));
     }
   }
-  else  {
+  else  { //stop the motors when remote control connection is lost
     driver.motorAStop();
     driver.motorBStop();
-    while(!rx.getConnectionStatus()) {
+    while(!rx.getConnectionStatus()) {  //wait for receiver to get a connection
       digitalWrite(13,1);
       delay(100);
       digitalWrite(13,0);
